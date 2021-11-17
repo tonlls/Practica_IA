@@ -308,20 +308,21 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        self._visited, self._visitedlist = {}, []
+
 
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-		return (self.startingPosition, [])
+        return (self.startingPosition, [])
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return len(state[1]) == 4
 
     def expand(self, state):
         """
@@ -338,7 +339,8 @@ class CornersProblem(search.SearchProblem):
         for action in self.getActions(state):
             # Add a child state to the child list if the action is legal
             # You should call getActions, getActionCost, and getNextState.
-            "*** YOUR CODE HERE ***"
+            nextState = self.getNextState(state, action)
+            children.append( (nextState, action, self.getActionCost(state,action,nextState)) )
 
         self._expanded += 1 # DO NOT CHANGE
         return children
@@ -365,8 +367,7 @@ class CornersProblem(search.SearchProblem):
         x, y = state[0]
         dx, dy = Actions.directionToVector(action)
         nextx, nexty = int(x + dx), int(y + dy)
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return (nextx, nexty), action
 
     def getCostOfActionSequence(self, actions):
         """
@@ -398,7 +399,10 @@ def cornersHeuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    "*** YOUR CODE HERE ***"
+    # return abs(corners[0][0] - state[0][0]) + abs(corners[0][1] - state[0][1]) + \
+            #   abs(corners[1][0] - state[0][0]) + abs(corners[1][1] - state[0][1]) + \
+                # abs(corners[2][0] - state[0][0]) + abs(corners[2][1] - state[0][1]) + \
+                    # abs(corners[3][0] - state[0][0]) + abs(corners[3][1] - state[0][1])
     return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
