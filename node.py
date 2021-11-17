@@ -1,11 +1,12 @@
 class Node:
-    def __init__(self, _state, _parent=None, _action=None, _cost=0):
+    def __init__(self, _state, _parent=None, _action=None, _cost=0, _heuristic=0):
         self.state = _state
         self.parent = _parent
         self.action = _action
         self.cost = _cost
+        self.heuristic = _heuristic
 
-    def total_path(self):
+    def getTotalPath(self):
 
         o=self.parent
         out=[self.action]

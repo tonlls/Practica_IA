@@ -17,6 +17,7 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
+from node import Node
 import util
 
 class SearchProblem:
@@ -127,11 +128,26 @@ def nullHeuristic(state, problem=None):
     goal in the provided SearchProblem.  This heuristic is trivial.
     """
     return 0
-
+    
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    openList=[]
+    closedList=[]
+    openList.append(Node(problem.getStartState(),None,None,0,0))
+    while len(openList)>0:
+        currentNode=openList.pop(0)
+        closedList.append(currentNode)
+        if problem.isGoalState(currentNode.state):
+            return currentNode.getTotalPath()
+        if currentNode.state not in closedList:
+            closedList.append(currentNode.state)
+            for child in problem.expand(currentNode.state):
+                childNode=Node(child[0],currentNode,child[1],currentNode.cost+child[2],heuristic(child[0],problem))
+                if childNode.state not in closedList:
+                    openList.append(childNode)
+                    openList.sort(key=lambda x: x.cost+x.heuristic)
+    print("No solution")
+    # sys.exit(-1)
 
 
 # Abbreviations
