@@ -40,6 +40,7 @@ from game import Actions
 import util
 import time
 import search
+import itertools
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -307,9 +308,10 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
+        # Initialize the problem
         "*** YOUR CODE HERE ***"
         self._visited, self._visitedlist = {}, []
-
+        self.goal = [ self.corners[0], self.corners[1], self.corners[2], self.corners[3] ]
 
     def getStartState(self):
         """
@@ -322,6 +324,10 @@ class CornersProblem(search.SearchProblem):
         """
         Returns whether this search state is a goal state of the problem.
         """
+        for c in self.corners:
+            if state[0] == c and state[0] not in state[1]:
+                state[1].append(c)
+        print(state)
         return len(state[1]) == 4
 
     def expand(self, state):
@@ -339,9 +345,9 @@ class CornersProblem(search.SearchProblem):
         for action in self.getActions(state):
             # Add a child state to the child list if the action is legal
             # You should call getActions, getActionCost, and getNextState.
-            nextState = self.getNextState(state, action)
-            children.append( (nextState, action, self.getActionCost(state,action,nextState)) )
-
+            child = self.getNextState(state, action)
+            stepCost = self.getActionCost(state, action, child)
+            children.append((child, action, stepCost))
         self._expanded += 1 # DO NOT CHANGE
         return children
 
@@ -367,7 +373,8 @@ class CornersProblem(search.SearchProblem):
         x, y = state[0]
         dx, dy = Actions.directionToVector(action)
         nextx, nexty = int(x + dx), int(y + dy)
-        return (nextx, nexty), action
+        nodes=state[1]
+        return (nextx, nexty), nodes
 
     def getCostOfActionSequence(self, actions):
         """
@@ -399,10 +406,12 @@ def cornersHeuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    # return abs(corners[0][0] - state[0][0]) + abs(corners[0][1] - state[0][1]) + \
-            #   abs(corners[1][0] - state[0][0]) + abs(corners[1][1] - state[0][1]) + \
-                # abs(corners[2][0] - state[0][0]) + abs(corners[2][1] - state[0][1]) + \
-                    # abs(corners[3][0] - state[0][0]) + abs(corners[3][1] - state[0][1])
+    x = mazeDistance(state[0], corners[0], problem)
+    y = mazeDistance(state[0], corners[1], problem)
+    z = mazeDistance(state[0], corners[2], problem)
+    w = mazeDistance(state[0], corners[3], problem)
+
+    return min(x, y, z, w)
     return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
@@ -482,6 +491,12 @@ class FoodSearchProblem:
                 return 999999
             cost += 1
         return cost
+        
+    def getWalls(self):
+        return self.walls
+
+    def getPacmanPosition(self):
+        return self.getStartState()[0]
 
 class AStarFoodSearchAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -519,7 +534,16 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    food = foodGrid.asList()
+    distancesMin = []
+    distancesMax = []
+    if len(food) == 0:
+        return 0
+    for index in food:
+        distancesMin.append(mazeDistance(position, index, problem))
+        for foodStart in food:
+            distancesMax.append(mazeDistance(foodStart, index, problem))
+    return max(distancesMax) + min(distancesMin) 
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"

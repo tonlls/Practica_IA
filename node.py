@@ -10,6 +10,8 @@ class Node:
 
         o=self.parent
         out=[self.action]
+        if o is None:
+            return []
         while o.parent is not None:
             out.append(o.action)
             o=o.parent

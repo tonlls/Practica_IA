@@ -19,12 +19,13 @@ Pacman agents (in searchAgents.py).
 
 from node import Node
 import util
+import sys
 
 class SearchProblem:
     """
     This class outlines the structure of a search problem, but doesn't implement
     any of the methods (in object-oriented terminology: an abstract class).
-
+    
     You do not need to change anything in this class, ever.
     """
 
@@ -37,7 +38,7 @@ class SearchProblem:
     def isGoalState(self, state):
         """
           state: Search state
-
+        
         Returns True if and only if the state is a valid goal state.
         """
         util.raiseNotDefined()
@@ -45,7 +46,7 @@ class SearchProblem:
     def expand(self, state):
         """
           state: Search state
-
+        
         For a given state, this should return a list of triples, (child,
         action, stepCost), where 'child' is a child to the current
         state, 'action' is the action required to get there, and 'stepCost' is
@@ -66,7 +67,7 @@ class SearchProblem:
           state: Search state
           action: action taken at state.
           next_state: next Search state after taking action.
-
+        
         For a given state, this should return the cost of the (s, a, s') transition.
         """
         util.raiseNotDefined()
@@ -75,7 +76,7 @@ class SearchProblem:
         """
           state: Search state
           action: action taken at state
-
+        
         For a given state, this should return the next state after taking action from state.
         """
         util.raiseNotDefined()
@@ -83,7 +84,7 @@ class SearchProblem:
     def getCostOfActionSequence(self, actions):
         """
          actions: A list of actions to take
-
+        
         This method returns the total cost of a particular sequence of actions.
         The sequence must be composed of legal moves.
         """
@@ -104,13 +105,13 @@ def tinyMazeSearch(problem):
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
-
+   
     Your search algorithm needs to return a list of actions that reaches the
     goal. Make sure to implement a graph search algorithm.
-
+   
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
-
+   
     print("Start:", problem.getStartState())
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     """
@@ -120,7 +121,28 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    n = Node(problem.getStartState())
+    if problem.isGoalState(problem.getStartState()):
+        return n.getTotalPath()
+
+    fringe = util.Queue()
+    fringe.push(n)
+    generated = set()   
+
+    while not fringe.isEmpty():
+        n = fringe.pop()
+        generated.add(n.state)  # Expanded
+
+        for s, a, c in problem.expand(n.state):
+            ns = Node(s, n, a, n.cost + c)
+            if ns.state not in generated:  # Not in expanded and not in fringe
+                if problem.isGoalState(ns.state):
+                    return ns.getTotalPath()
+                fringe.push(ns)
+                generated.add(ns.state)  # Fringe
+
+    print("No solution")
+    sys.exit(-1)
 
 def nullHeuristic(state, problem=None):
     """
