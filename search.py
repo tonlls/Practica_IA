@@ -120,6 +120,31 @@ def depthFirstSearch(problem):
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
+    n = Node(problem.getStartState())
+    if problem.isGoalState(problem.getStartState()):
+        return n.getTotalPath()
+
+    fringe = util.Queue()
+    fringe.push(n)
+    generated = set()   
+
+    while not fringe.isEmpty():
+        n = fringe.pop()
+        generated.add(n.state)  # Expanded
+
+        for s, a, c in problem.expand(n.state):
+            ns = Node(s, n, a, n.cost + c)
+            if ns.state not in generated:  # Not in expanded and not in fringe
+                if problem.isGoalState(ns.state):
+                    return ns.getTotalPath()
+                fringe.push(ns)
+                generated.add(ns.state)  # Fringe
+
+    print("No solution")
+
+
+def uniformCostSearch(problem):
+    """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     n = Node(problem.getStartState())
     if problem.isGoalState(problem.getStartState()):
