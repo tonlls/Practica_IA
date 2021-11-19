@@ -367,7 +367,9 @@ class CornersProblem(search.SearchProblem):
         x, y = state[0]
         dx, dy = Actions.directionToVector(action)
         nextx, nexty = int(x + dx), int(y + dy)
-        return (nextx, nexty), action
+        if (nextx, nexty) in self.corners and (nextx, nexty) not in state[1]:
+            return (nextx, nexty), state[1]+[(nextx, nexty)]
+        return (nextx, nexty), state[1]
 
     def getCostOfActionSequence(self, actions):
         """
@@ -398,12 +400,16 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+    h_sum = 0
+    un_Visited_Corner =  [c for c in corners if c not in state[1]]
+    cur_position = state[0]
+    while(len(un_Visited_Corner)!=0):
+        distance, corner = min( [(util.manhattanDistance(cur_position ,corner),corner) for corner in un_Visited_Corner] )
+        h_sum = h_sum + distance
+        cur_position = corner
+        un_Visited_Corner.remove(corner) 
 
-    # return abs(corners[0][0] - state[0][0]) + abs(corners[0][1] - state[0][1]) + \
-            #   abs(corners[1][0] - state[0][0]) + abs(corners[1][1] - state[0][1]) + \
-                # abs(corners[2][0] - state[0][0]) + abs(corners[2][1] - state[0][1]) + \
-                    # abs(corners[3][0] - state[0][0]) + abs(corners[3][1] - state[0][1])
-    return 0 # Default to trivial solution
+    return h_sum 
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -518,7 +524,6 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
     return 0
 
 class ClosestDotSearchAgent(SearchAgent):

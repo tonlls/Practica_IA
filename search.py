@@ -119,8 +119,60 @@ def depthFirstSearch(problem):
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
+    n = Node(problem.getStartState())
+    if problem.isGoalState(problem.getStartState()):
+        return n.getTotalPath()
+
+    fringe = util.Queue()
+    fringe.push(n)
+    generated = set()   
+
+    while not fringe.isEmpty():
+        n = fringe.pop()
+        generated.add(n.state)  # Expanded
+
+        for s, a, c in problem.expand(n.state):
+            ns = Node(s, n, a, n.cost + c)
+            if ns.state not in generated:  # Not in expanded and not in fringe
+                if problem.isGoalState(ns.state):
+                    return ns.getTotalPath()
+                fringe.push(ns)
+                generated.add(ns.state)  # Fringe
+
+    print("No solution")
+
+
+def uniformCostSearch(problem):
+    """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    n = Node(problem.getStartState())
+    if problem.isGoalState(problem.getStartState()):
+        return n.total_path()
+
+    fringe = util.PriorityQueue()
+    generated = {}
+    fringe.push(n, 0)
+    generated[n.state] = ("F", 0)
+
+    while not fringe.isEmpty():
+        n = fringe.pop()
+        if problem.isGoalState(n.state):
+            return n.total_path()
+        if generated[n.state][0] == "E":
+            # Node has been expanded, continue
+            continue
+        generated[n.state] = ("E", n.cost)
+        for s, a, c in problem.getSuccessors(n.state):
+            ns = Node(s, n, a, n.cost + c)
+            if ns.state not in generated:
+                fringe.push(ns, ns.cost)
+                generated[ns.state] = ("F", ns.cost)
+            elif generated[ns.state][0] == "F" and generated[ns.state][1] > ns.cost:
+                fringe.update(ns, ns.cost)
+                generated[ns.state] = ("F", ns.cost)
+
+    print("No solution")
+    # sys.exit(-1)
 
 def nullHeuristic(state, problem=None):
     """
