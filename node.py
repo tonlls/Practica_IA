@@ -7,7 +7,6 @@ class Node:
         self.heuristic = _heuristic
 
     def getTotalPath(self):
-
         o=self.parent
         out=[self.action]
         if o is None:
@@ -20,6 +19,8 @@ class Node:
             # return []
         # return self.parent.total_path()+[self.action]
     
+    def __eq__(self, other):
+        return self.state == other.state
     def __repr__(self):
         return self.__str__()
 
